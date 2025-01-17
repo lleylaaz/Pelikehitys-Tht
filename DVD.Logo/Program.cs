@@ -20,7 +20,7 @@ class Program
         Vector2 direction = new Vector2(1, 1); // Molempiin suuntiin
         float speed = 100.0f;
 
-        int fontSize = 50;
+        int fontSize = 45;
         Vector2 textSize = Raylib.MeasureTextEx(Raylib.GetFontDefault(), "DVD", fontSize, 2);
 
         // Värit
