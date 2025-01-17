@@ -10,7 +10,7 @@ class Program
         // Ikkuna
         const int screenWidth = 800;
         const int screenHeight = 600;
-        Raylib.InitWindow(screenWidth, screenHeight, "DVD Bouncing Text");
+        Raylib.InitWindow(screenWidth, screenHeight, "DVD Logo");
 
         // FPS
         Raylib.SetTargetFPS(60);
