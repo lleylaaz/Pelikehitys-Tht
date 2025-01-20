@@ -22,15 +22,33 @@ namespace NuoliTehtava
         // Nuoli-luokka
         class Nuoli
         {
+            // Ominaisuudet (Properties)
             public KarjenTyyppi Karki { get; private set; }
             public PeranTyyppi Pera { get; private set; }
             public double VarsiPituus { get; private set; }
 
+            // Konstruktorissa asetetaan ominaisuuksien arvot
             public Nuoli(KarjenTyyppi karki, PeranTyyppi pera, double varsiPituus)
             {
                 Karki = karki;
                 Pera = pera;
                 VarsiPituus = varsiPituus;
+            }
+
+            // Staattiset metodit valmiille nuolipohjille
+            public static Nuoli LuoEliittiNuoli()
+            {
+                return new Nuoli(KarjenTyyppi.Timantti, PeranTyyppi.Kotkansulka, 100);
+            }
+
+            public static Nuoli LuoAloittelijaNuoli()
+            {
+                return new Nuoli(KarjenTyyppi.Puu, PeranTyyppi.Kanansulka, 70);
+            }
+
+            public static Nuoli LuoPerusNuoli()
+            {
+                return new Nuoli(KarjenTyyppi.Teräs, PeranTyyppi.Kanansulka, 85);
             }
 
             // Metodi hinnan laskemiseen
@@ -47,7 +65,44 @@ namespace NuoliTehtava
         {
             Console.WriteLine("Tervetuloa nuoli kauppaan!");
 
-            // Valitse kärki
+            // Valinta valmiiden pohjien ja kustomoidun nuolen välillä
+            Console.WriteLine("\nValitse haluamasi toiminto:");
+            Console.WriteLine("1: Luo eliittinuoli (timanttikärki, 100 cm varsi, kotkansulka)");
+            Console.WriteLine("2: Luo aloittelijanuoli (puukärki, 70 cm varsi, kanansulka)");
+            Console.WriteLine("3: Luo perusnuoli (teräskärki, 85 cm varsi, kanansulka)");
+            Console.WriteLine("4: Luo kustomoitu nuoli");
+            int valinta = int.Parse(Console.ReadLine());
+
+            Nuoli nuoli;
+
+            switch (valinta)
+            {
+                case 1:
+                    nuoli = Nuoli.LuoEliittiNuoli();
+                    break;
+                case 2:
+                    nuoli = Nuoli.LuoAloittelijaNuoli();
+                    break;
+                case 3:
+                    nuoli = Nuoli.LuoPerusNuoli();
+                    break;
+                case 4:
+                    nuoli = LuoKustomoituNuoli();
+                    break;
+                default:
+                    Console.WriteLine("Virheellinen valinta. Ohjelma päättyy.");
+                    return;
+            }
+
+            // Tulostetaan nuolen tiedot ja hinta
+            double hinta = nuoli.PalautaHinta();
+            Console.WriteLine($"\nLoit nuolen: {nuoli.Karki} kärki, {nuoli.Pera} perä, {nuoli.VarsiPituus} cm varsi.");
+            Console.WriteLine($"Nuolen hinta: {hinta} kultaa.");
+        }
+
+        static Nuoli LuoKustomoituNuoli()
+        {
+            // Kärki
             Console.WriteLine("\nValitse kärjen tyyppi:");
             foreach (var karki in Enum.GetValues<KarjenTyyppi>())
             {
@@ -55,7 +110,7 @@ namespace NuoliTehtava
             }
             KarjenTyyppi valittuKarki = (KarjenTyyppi)int.Parse(Console.ReadLine());
 
-            // Valitse perä
+            // Perä
             Console.WriteLine("\nValitse perän tyyppi:");
             foreach (var pera in Enum.GetValues<PeranTyyppi>())
             {
@@ -63,22 +118,17 @@ namespace NuoliTehtava
             }
             PeranTyyppi valittuPera = (PeranTyyppi)int.Parse(Console.ReadLine());
 
-            // Valitse varren pituus
+            // Varren pituus
             Console.WriteLine("\nAnna varren pituus (60-100 cm):");
             double varsiPituus = double.Parse(Console.ReadLine());
             if (varsiPituus < 60 || varsiPituus > 100)
             {
                 Console.WriteLine("Varren pituuden täytyy olla välillä 60-100 cm.");
-                return;
+                return null;
             }
 
-            // Luo nuoli ja laske hinta
-            Nuoli nuoli = new Nuoli(valittuKarki, valittuPera, varsiPituus);
-            double hinta = nuoli.PalautaHinta();
-
-            // Tulosta nuolen tiedot ja hinta
-            Console.WriteLine($"\nLoit nuolen: {valittuKarki} kärki, {valittuPera} perä, {varsiPituus} cm varsi.");
-            Console.WriteLine($"Nuolen hinta: {hinta} kultaa.");
+            return new Nuoli(valittuKarki, valittuPera, varsiPituus);
         }
     }
 }
+
