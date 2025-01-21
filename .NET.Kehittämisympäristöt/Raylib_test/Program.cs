@@ -15,33 +15,29 @@ namespace Raylib_test
             Vector2 dirB = new Vector2(1, -1);
             Vector2 dirC = new Vector2(-1, -1);
 
-            float speed = 200f; // Pixels per second
+            float speed = 200f;
 
             Raylib.InitWindow(800, 800, "Raylib_test");
             float deltaTime;
-     
+            
             while (!Raylib.WindowShouldClose())
             {
                 deltaTime = Raylib.GetFrameTime();
 
-                // Update positions
                 A += dirA * speed * deltaTime;
                 B += dirB * speed * deltaTime;
                 C += dirC * speed * deltaTime;
 
-                // Check boundaries for A
                 if (A.X < 0 || A.X > 800) dirA.X *= -1;
                 if (A.Y < 0 || A.Y > 800) dirA.Y *= -1;
 
-                // Check boundaries for B
                 if (B.X < 0 || B.X > 800) dirB.X *= -1;
                 if (B.Y < 0 || B.Y > 800) dirB.Y *= -1;
 
-                // Check boundaries for C
                 if (C.X < 0 || C.X > 800) dirC.X *= -1;
                 if (C.Y < 0 || C.Y > 800) dirC.Y *= -1;
 
-                // Drawing
+                // Piirtäminen
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Color.DarkPurple);
 
