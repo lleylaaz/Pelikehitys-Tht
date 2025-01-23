@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 // Tavara-luokka
 public abstract class Tavara
@@ -12,37 +13,69 @@ public abstract class Tavara
         Paino = paino;
         Tilavuus = tilavuus;
     }
+
+    public abstract override string ToString();
 }
 
 // Tavarat
 public class Nuoli : Tavara
 {
     public Nuoli() : base(0.1, 0.05) { }
+
+    public override string ToString()
+    {
+        return "Nuoli";
+    }
 }
 
 public class Jousi : Tavara
 {
     public Jousi() : base(1, 4) { }
+
+    public override string ToString()
+    {
+        return "Jousi";
+    }
 }
 
 public class Köysi : Tavara
 {
     public Köysi() : base(1, 1.5) { }
+
+    public override string ToString()
+    {
+        return "Köysi";
+    }
 }
 
 public class Vesi : Tavara
 {
     public Vesi() : base(2, 2) { }
+
+    public override string ToString()
+    {
+        return "Vesi";
+    }
 }
 
 public class Ruoka : Tavara
 {
     public Ruoka() : base(1, 0.5) { }
+
+    public override string ToString()
+    {
+        return "Ruoka";
+    }
 }
 
 public class Miekka : Tavara
 {
     public Miekka() : base(5, 3) { }
+
+    public override string ToString()
+    {
+        return "Miekka";
+    }
 }
 
 // Reppu-luokka
@@ -95,6 +128,18 @@ public class Reppu
         }
         return tilavuus;
     }
+
+    public override string ToString()
+    {
+        if (tavarat.Count == 0)
+        {
+            return "Reppu on tyhjä.";
+        }
+
+        var sisalto = new StringBuilder("Reppussa on seuraavat tavarat: ");
+        sisalto.Append(string.Join(", ", tavarat));
+        return sisalto.ToString();
+    }
 }
 
 // Pääohjelma
@@ -103,6 +148,9 @@ public class Program
     public static void Main()
     {
         var reppu = new Reppu(10, 30, 20);
+
+        Console.WriteLine(reppu.ToString()); // Tulostaa repun sisällön
+
         while (true)
         {
             Console.WriteLine($"Reppu: {reppu.TavaroidenMaara}/{reppu.MaxTavarat} tavaraa, {reppu.TavaroidenPaino}/{reppu.MaxPaino} painoa, ja {reppu.TavaroidenTilavuus}/{reppu.MaxTilavuus} tilavuus.");
@@ -135,6 +183,7 @@ public class Program
             if (reppu.Lisää(tavara))
             {
                 Console.WriteLine("Tavara lisätty reppuun.");
+                Console.WriteLine(reppu.ToString()); // Päivitetty sisällön tulostus
             }
             else
             {
@@ -143,3 +192,4 @@ public class Program
         }
     }
 }
+
