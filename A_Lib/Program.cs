@@ -1,7 +1,8 @@
 ﻿using Raylib_cs;
 using System.Collections.Generic;
 using System.Numerics;
-using A_Lib;
+using A_lib;
+// Käytin johonkin kohtiin ChatGPT.
 
 namespace ASTEROIDS
 {
@@ -26,7 +27,7 @@ namespace ASTEROIDS
         bool gameWon = false;
         bool levelCompleted = false;
 
-        float playerDamageCooldown = 0f; // uusi cooldown-väli
+        float playerDamageCooldown = 0f;
 
         Rectangle startButton = new Rectangle(300, 300, 200, 50);
         Rectangle nextLevelButton = new Rectangle(290, 300, 200, 50);
@@ -53,7 +54,6 @@ namespace ASTEROIDS
             for (int i = 0; i < asteroidCount; i++)
             {
                 Vector2 pos;
-
                 do
                 {
                     pos = new Vector2(rand.Next(100, 700), rand.Next(100, 500));
@@ -63,11 +63,6 @@ namespace ASTEROIDS
                 Vector2 vel = new Vector2(rand.Next(-100, 100), rand.Next(-100, 100));
                 asteroids.Add(new Asteroids(pos, vel, asteroidTexture, 1.0f));
             }
-        }
-
-        bool CheckCollision(Vector2 pos1, float radius1, Vector2 pos2, float radius2)
-        {
-            return Vector2.Distance(pos1, pos2) < radius1 + radius2;
         }
 
         public void Run()
@@ -87,7 +82,7 @@ namespace ASTEROIDS
             while (!Raylib.WindowShouldClose())
             {
                 float deltaTime = Raylib.GetFrameTime();
-                playerDamageCooldown -= deltaTime; 
+                playerDamageCooldown -= deltaTime;
 
                 if (startMenu)
                 {
@@ -129,8 +124,8 @@ namespace ASTEROIDS
                     {
                         for (int j = asteroids.Count - 1; j >= 0; j--)
                         {
-                            if (CheckCollision(bullets[i].transform.position, bullets[i].Radius,
-                                               asteroids[j].transform.position, asteroids[j].Radius))
+                            if (Raylib.CheckCollisionCircles(bullets[i].transform.position, bullets[i].Radius,
+                                                             asteroids[j].transform.position, asteroids[j].Radius))
                             {
                                 bullets[i].isAlive = false;
                                 score += (int)(100 * asteroids[j].size);
@@ -157,13 +152,13 @@ namespace ASTEROIDS
                     {
                         asteroid.transform.Move();
 
-                        if (CheckCollision(asteroid.transform.position, asteroid.Radius,
-                                           playerRocket.transform.position, playerRocket.Radius))
+                        if (Raylib.CheckCollisionCircles(asteroid.transform.position, asteroid.Radius,
+                                                         playerRocket.transform.position, playerRocket.Radius))
                         {
-                            if (playerDamageCooldown <= 0f) 
+                            if (playerDamageCooldown <= 0f)
                             {
                                 lives--;
-                                playerDamageCooldown = 1f; 
+                                playerDamageCooldown = 1f;
 
                                 playerRocket.transform.position = new Vector2(Raylib.GetScreenWidth() / 2f, Raylib.GetScreenHeight() / 2f);
                                 playerRocket.transform.velocity = Vector2.Zero;
@@ -238,18 +233,17 @@ namespace ASTEROIDS
                     Raylib.DrawRectangleRec(quitButton, Color.Gray);
                     Raylib.DrawRectangleRec(continueButton, Color.Gray);
                     Raylib.DrawText("QUIT", 370, 310, 30, Color.Black);
-                    Raylib.DrawText("CONTINUE", 33-0, 380, 30, Color.Black);
+                    Raylib.DrawText("CONTINUE", 330, 380, 30, Color.Black);
                 }
                 else if (levelCompleted && !gameWon)
                 {
-                    Raylib.DrawText("LEVEL COMPLETE!", 270, 200, 30, Color.Yellow);
+                    Raylib.DrawText("LEVEL COMPLETE!", 220, 200, 40, Color.Yellow);
                     Raylib.DrawRectangleRec(nextLevelButton, Color.Gray);
-                    Raylib.DrawText("NEXT LEVEL", 310, 310, 20, Color.Black);
+                    Raylib.DrawText("NEXT LEVEL", 310, 310, 25, Color.Black);
                 }
                 else if (gameWon)
                 {
-                    Raylib.DrawText("YOU WIN!", 330, 200, 30, Color.Green);
-                    Raylib.DrawText("QUIT", 370, 310, 30, Color.Black);
+                    Raylib.DrawText("YOU WIN!", 300, 300, 50, Color.Green);
                 }
                 else
                 {
@@ -276,5 +270,3 @@ namespace ASTEROIDS
         }
     }
 }
-
-
