@@ -1,9 +1,10 @@
-﻿using Raylib_cs;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Numerics;
 using A_Lib;
+using ASTEROIDS;
+using Raylib_cs;
 
-namespace ASTEROIDS
+namespace A_Lib
 {
     public class Program
     {
@@ -21,17 +22,28 @@ namespace ASTEROIDS
         int lives = 5;
         int maxLevel = 3;
 
+        // Esimerkki asetukset
+        int difficulty = 1; 
+        int volume = 50;    
+
         bool startMenu = true;
         bool gameOver = false;
         bool gameWon = false;
         bool levelCompleted = false;
+        bool pauseMenu = false;
+        bool settingsMenu = false;
 
-        float playerDamageCooldown = 0f; // uusi cooldown-väli
+        float playerDamageCooldown = 0f;
 
         Rectangle startButton = new Rectangle(300, 300, 200, 50);
         Rectangle nextLevelButton = new Rectangle(290, 300, 200, 50);
         Rectangle quitButton = new Rectangle(300, 300, 200, 50);
         Rectangle continueButton = new Rectangle(300, 370, 200, 50);
+
+        // Pause- ja settings-valikon napit
+        Rectangle resumeButton = new Rectangle(300, 250, 200, 50);
+        Rectangle settingsButton = new Rectangle(300, 320, 200, 50);
+        Rectangle backButton = new Rectangle(300, 400, 200, 50);
 
         static void Main(string[] args)
         {
@@ -42,7 +54,8 @@ namespace ASTEROIDS
         void CreateLevel(int level)
         {
             asteroids.Clear();
-            int asteroidCount = level switch
+
+            int baseAsteroids = level switch
             {
                 1 => 2,
                 2 => 4,
@@ -50,10 +63,17 @@ namespace ASTEROIDS
                 _ => 0
             };
 
+            int asteroidCount = difficulty switch
+            {
+                0 => baseAsteroids,       
+                1 => baseAsteroids + 2,    
+                2 => baseAsteroids + 4,    
+                _ => baseAsteroids
+            };
+
             for (int i = 0; i < asteroidCount; i++)
             {
                 Vector2 pos;
-
                 do
                 {
                     pos = new Vector2(rand.Next(100, 700), rand.Next(100, 500));
@@ -63,11 +83,6 @@ namespace ASTEROIDS
                 Vector2 vel = new Vector2(rand.Next(-100, 100), rand.Next(-100, 100));
                 asteroids.Add(new Asteroids(pos, vel, asteroidTexture, 1.0f));
             }
-        }
-
-        bool CheckCollision(Vector2 pos1, float radius1, Vector2 pos2, float radius2)
-        {
-            return Vector2.Distance(pos1, pos2) < radius1 + radius2;
         }
 
         public void Run()
@@ -87,7 +102,7 @@ namespace ASTEROIDS
             while (!Raylib.WindowShouldClose())
             {
                 float deltaTime = Raylib.GetFrameTime();
-                playerDamageCooldown -= deltaTime; 
+                playerDamageCooldown -= deltaTime;
 
                 if (startMenu)
                 {
@@ -102,6 +117,111 @@ namespace ASTEROIDS
                         Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), startButton))
                     {
                         startMenu = false;
+                    }
+                    continue;
+                }
+
+                // PAUSE KEY
+                if (!startMenu && !gameOver && !levelCompleted && !gameWon && !settingsMenu)
+                {
+                    if (Raylib.IsKeyPressed(KeyboardKey.P) || Raylib.IsKeyPressed(KeyboardKey.Escape))
+                    {
+                        pauseMenu = !pauseMenu;
+                    }
+                }
+
+                // PAUSE MENU
+                if (pauseMenu)
+                {
+                    Raylib.BeginDrawing();
+                    Raylib.ClearBackground(Color.Black);
+
+                    Raylib.DrawText("GAME PAUSED", 280, 150, 40, Color.White);
+
+                    Raylib.DrawRectangleRec(resumeButton, Color.Gray);
+                    Raylib.DrawText("RESUME", 340, 260, 25, Color.Black);
+
+                    Raylib.DrawRectangleRec(settingsButton, Color.Gray);
+                    Raylib.DrawText("SETTINGS", 330, 330, 25, Color.Black);
+
+                    Raylib.DrawRectangleRec(backButton, Color.Gray);
+                    Raylib.DrawText("MAIN MENU", 330, 410, 25, Color.Black);
+
+                    Raylib.EndDrawing();
+
+                    if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+                    {
+                        Vector2 mouse = Raylib.GetMousePosition();
+                        if (Raylib.CheckCollisionPointRec(mouse, resumeButton))
+                        {
+                            pauseMenu = false;
+                        }
+                        else if (Raylib.CheckCollisionPointRec(mouse, settingsButton))
+                        {
+                            settingsMenu = true;
+                            pauseMenu = false;
+                        }
+                        else if (Raylib.CheckCollisionPointRec(mouse, backButton))
+                        {
+                            startMenu = true;
+                            pauseMenu = false;
+                            bullets.Clear();
+                            asteroids.Clear();
+                            level = 1;
+                            lives = 5;
+                            CreateLevel(level);
+                            playerRocket.transform.position = new Vector2(Raylib.GetScreenWidth() / 2f, Raylib.GetScreenHeight() / 2f);
+                            playerRocket.transform.velocity = Vector2.Zero;
+                        }
+                    }
+                    continue;
+                }
+
+                // SETTINGS MENU
+                if (settingsMenu)
+                {
+                    Raylib.BeginDrawing();
+                    Raylib.ClearBackground(Color.DarkGray);
+
+                    Raylib.DrawText("SETTINGS", 320, 120, 40, Color.White);
+
+                    // Difficulty
+                    Raylib.DrawText("Difficulty:", 250, 200, 20, Color.White);
+                    string diffText = difficulty switch
+                    {
+                        0 => "Easy",
+                        1 => "Normal",
+                        2 => "Hard",
+                        _ => "Normal"
+                    };
+                    Raylib.DrawText(diffText, 400, 200, 20, Color.Yellow);
+
+                    if (Raylib.IsKeyPressed(KeyboardKey.Left))
+                        difficulty = (difficulty + 2) % 3;
+                    if (Raylib.IsKeyPressed(KeyboardKey.Right))
+                        difficulty = (difficulty + 1) % 3;
+
+                    Raylib.DrawText("Volume:", 250, 260, 20, Color.White);
+                    Raylib.DrawRectangle(400, 265, 100, 10, Color.DarkGray);
+                    Raylib.DrawRectangle(400, 265, volume, 10, Color.Green);
+                    Raylib.DrawText(volume.ToString(), 520, 255, 20, Color.White);
+
+                    if (Raylib.IsKeyDown(KeyboardKey.Up) && volume < 100) volume++;
+                    if (Raylib.IsKeyDown(KeyboardKey.Down) && volume > 0) volume--;
+
+                    Raylib.DrawRectangleRec(backButton, Color.Gray);
+                    Raylib.DrawText("BACK", 360, 410, 25, Color.Black);
+
+                    Raylib.EndDrawing();
+
+                    if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+                    {
+                        Vector2 mouse = Raylib.GetMousePosition();
+                        if (Raylib.CheckCollisionPointRec(mouse, backButton))
+                        {
+                            settingsMenu = false;
+                            pauseMenu = true;
+                        }
                     }
                     continue;
                 }
@@ -129,8 +249,8 @@ namespace ASTEROIDS
                     {
                         for (int j = asteroids.Count - 1; j >= 0; j--)
                         {
-                            if (CheckCollision(bullets[i].transform.position, bullets[i].Radius,
-                                               asteroids[j].transform.position, asteroids[j].Radius))
+                            if (Raylib.CheckCollisionCircles(bullets[i].transform.position, bullets[i].Radius,
+                                                             asteroids[j].transform.position, asteroids[j].Radius))
                             {
                                 bullets[i].isAlive = false;
                                 score += (int)(100 * asteroids[j].size);
@@ -157,13 +277,13 @@ namespace ASTEROIDS
                     {
                         asteroid.transform.Move();
 
-                        if (CheckCollision(asteroid.transform.position, asteroid.Radius,
-                                           playerRocket.transform.position, playerRocket.Radius))
+                        if (Raylib.CheckCollisionCircles(asteroid.transform.position, asteroid.Radius,
+                                                         playerRocket.transform.position, playerRocket.Radius))
                         {
-                            if (playerDamageCooldown <= 0f) 
+                            if (playerDamageCooldown <= 0f)
                             {
                                 lives--;
-                                playerDamageCooldown = 1f; 
+                                playerDamageCooldown = 1f;
 
                                 playerRocket.transform.position = new Vector2(Raylib.GetScreenWidth() / 2f, Raylib.GetScreenHeight() / 2f);
                                 playerRocket.transform.velocity = Vector2.Zero;
@@ -226,30 +346,23 @@ namespace ASTEROIDS
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Color.Black);
 
-                if (startMenu)
-                {
-                    Raylib.DrawText("Welcome to Asteroids", 320, 200, 30, Color.White);
-                    Raylib.DrawRectangleRec(startButton, Color.Gray);
-                    Raylib.DrawText("START", 360, 310, 20, Color.Black);
-                }
-                else if (gameOver)
+                if (gameOver)
                 {
                     Raylib.DrawText("GAME OVER", 280, 200, 40, Color.Red);
                     Raylib.DrawRectangleRec(quitButton, Color.Gray);
                     Raylib.DrawRectangleRec(continueButton, Color.Gray);
                     Raylib.DrawText("QUIT", 370, 310, 30, Color.Black);
-                    Raylib.DrawText("CONTINUE", 33-0, 380, 30, Color.Black);
+                    Raylib.DrawText("CONTINUE", 330, 380, 30, Color.Black);
                 }
                 else if (levelCompleted && !gameWon)
                 {
-                    Raylib.DrawText("LEVEL COMPLETE!", 270, 200, 30, Color.Yellow);
+                    Raylib.DrawText("LEVEL COMPLETE!", 220, 200, 40, Color.Yellow);
                     Raylib.DrawRectangleRec(nextLevelButton, Color.Gray);
-                    Raylib.DrawText("NEXT LEVEL", 310, 310, 20, Color.Black);
+                    Raylib.DrawText("NEXT LEVEL", 310, 310, 25, Color.Black);
                 }
                 else if (gameWon)
                 {
-                    Raylib.DrawText("YOU WIN!", 330, 200, 30, Color.Green);
-                    Raylib.DrawText("QUIT", 370, 310, 30, Color.Black);
+                    Raylib.DrawText("YOU WIN!", 300, 300, 50, Color.Green);
                 }
                 else
                 {
@@ -276,5 +389,6 @@ namespace ASTEROIDS
         }
     }
 }
+
 
 
