@@ -30,7 +30,7 @@ class Bullet
     public void Draw()
     {
         if (Active)
-            Raylib.DrawCircle((int)Position.X, (int)Position.Y, 5, Color.Red);
+            Raylib.DrawCircle((int)Position.X, (int)Position.Y, 5, Color.Black);
     }
 }
 

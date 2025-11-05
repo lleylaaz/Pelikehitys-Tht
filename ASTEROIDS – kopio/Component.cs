@@ -1,7 +1,4 @@
-﻿using System;
-using A_Lib;
-
-namespace ASTEROIDS
+﻿namespace ASTEROIDS
 {
     public abstract class Component
     {

@@ -1,112 +1,129 @@
-﻿using System.Numerics;
-using Raylib_cs;
+﻿using Raylib_cs;
+using System.Numerics;
+using System.Collections.Generic;
 
-class MainProgram
+class Program
 {
     static void Main()
     {
         const int screenWidth = 800;
         const int screenHeight = 600;
-        Raylib.InitWindow(screenWidth, screenHeight, "TANKS! Peli");
+        Raylib.InitWindow(screenWidth, screenHeight, "TANKS");
         Raylib.SetTargetFPS(60);
 
-        Tank blueTank = new Tank(100, 500, Color.Blue);
-        Tank redTank = new Tank(700, 500, Color.Red);
+        Texture2D brickTexture = Raylib.LoadTexture("Brick_Wall_Texture.jpg");
+        Texture2D blueTankTexture = Raylib.LoadTexture("Blue_Tank_Texture.jpg");
+        Texture2D redTankTexture = Raylib.LoadTexture("Red_Tank_Texture.jpg");
+
+        GameState gameState = GameState.MainMenu;
+        Menu menu = new Menu();
+
+        Tank blueTank = new Tank(100, 500, Color.Blue, blueTankTexture);
+        Tank redTank = new Tank(700, 500, Color.Red, redTankTexture);
 
         int blueScore = 0;
         int redScore = 0;
 
-        List<Walls> walls = new List<Walls>();
-        Random rand = new Random();
-
-        Vector2 blueSpawn = new Vector2(100, 100);
-        Vector2 redSpawn = new Vector2(screenWidth - 100, 100);
-
-        int wallsCreated = 0;
-        while (wallsCreated < 3)
-        {
-            float x = rand.Next(50, screenWidth - 100);
-            float y = rand.Next(50, screenHeight - 100);
-            float width = rand.Next(50, 100);
-            float height = rand.Next(100, 150);
-            Color color = Color.DarkBrown;
-
-            Vector2 wallCenter = new Vector2(x + width / 2, y + height / 2);
-
-            float blueDist = Vector2.Distance(wallCenter, blueSpawn);
-            float redDist = Vector2.Distance(wallCenter, redSpawn);
-
-            if (blueDist > 100 && redDist > 100)
-            {
-                walls.Add(new Walls(x, y, width, height, color));
-                wallsCreated++;
-            }
-        }
-
+        List<Walls> walls = GenerateWalls(screenWidth, screenHeight, brickTexture);
 
         while (!Raylib.WindowShouldClose())
         {
-            bool blueWasHit = redTank.Update(KeyboardKey.Up, KeyboardKey.Down, KeyboardKey.Left, KeyboardKey.Right, KeyboardKey.Enter, walls, blueTank);
-            bool redWasHit = blueTank.Update(KeyboardKey.W, KeyboardKey.S, KeyboardKey.A, KeyboardKey.D, KeyboardKey.Space, walls, redTank);
-
-            if (blueWasHit)
+            switch (gameState)
             {
-                redScore++;
-                ResetGame(blueTank, redTank, out walls, screenWidth, screenHeight);
+                case GameState.MainMenu:
+                case GameState.GameOver:
+                    menu.Update(ref gameState, blueScore, redScore);
+                    menu.Draw(gameState, blueScore, redScore);
+                    break;
+
+                case GameState.Playing:
+                    bool blueWasHit = redTank.Update(KeyboardKey.Up, KeyboardKey.Down, KeyboardKey.Left, KeyboardKey.Right, KeyboardKey.Enter, walls, blueTank);
+                    bool redWasHit = blueTank.Update(KeyboardKey.W, KeyboardKey.S, KeyboardKey.A, KeyboardKey.D, KeyboardKey.Space, walls, redTank);
+
+                    if (blueWasHit)
+                    {
+                        redScore++;
+                        gameState = GameState.GameOver;
+                        ResetGame(blueTank, redTank, out walls, screenWidth, screenHeight, brickTexture);
+                    }
+                    else if (redWasHit)
+                    {
+                        blueScore++;
+                        gameState = GameState.GameOver;
+                        ResetGame(blueTank, redTank, out walls, screenWidth, screenHeight, brickTexture);
+                    }
+
+                    Raylib.BeginDrawing();
+                    Raylib.ClearBackground(Color.White);
+
+                    foreach (var wall in walls)
+                        wall.DrawTiled();
+
+                    blueTank.Draw();
+                    redTank.Draw();
+
+                    Raylib.DrawText($"Blue: {blueScore}", 30, 10, 20, Color.Blue);
+                    Raylib.DrawText($"Red: {redScore}", screenWidth - 100, 10, 20, Color.Red);
+
+                    Raylib.EndDrawing();
+                    break;
             }
-            else if (redWasHit)
-            {
-                blueScore++;
-                ResetGame(blueTank, redTank, out walls, screenWidth, screenHeight);
-            }
-
-            Raylib.BeginDrawing();
-            Raylib.ClearBackground(Color.LightGray);
-
-            foreach (Walls wall in walls)
-                wall.Draw();
-
-            blueTank.Draw();
-            redTank.Draw();
-
-            Raylib.DrawText($"Sininen: {blueScore}", 10, 10, 20, Color.Blue);
-            Raylib.DrawText($"Punainen: {redScore}", screenWidth - 150, 10, 20, Color.Red);
-
-            Raylib.EndDrawing();
         }
 
         Raylib.CloseWindow();
     }
 
-    static List<Walls> GenerateWalls(int screenWidth, int screenHeight)
+    static List<Walls> GenerateWalls(int screenWidth, int screenHeight, Texture2D texture)
     {
         List<Walls> walls = new List<Walls>();
         Random rand = new Random();
 
-        for (int i = 0; i < 3; i++)
+        Vector2 blueSpawn = new Vector2(100, 500);
+        Vector2 redSpawn = new Vector2(700, 500);
+        float safeRadius = 100;
+
+        int maxAttempts = 50;
+        int createdWalls = 0;
+
+        while (createdWalls < 5)
         {
+            int attempts = 0;
             float x = rand.Next(50, screenWidth - 150);
             float y = rand.Next(50, screenHeight - 150);
-            float width = rand.Next(50, 100);
-            float height = rand.Next(100, 150);
-            walls.Add(new Walls(x, y, width, height, Color.DarkBrown));
+            float width = rand.Next(50, 120);
+            float height = rand.Next(50, 150);
+
+            Rectangle newWallRect = new Rectangle(x, y, width, height);
+
+            bool valid = Vector2.Distance(new Vector2(x, y), blueSpawn) > safeRadius &&
+                         Vector2.Distance(new Vector2(x, y), redSpawn) > safeRadius;
+
+            foreach (var wall in walls)
+            {
+                if (Raylib.CheckCollisionRecs(newWallRect, wall.GetBounds()))
+                {
+                    valid = false;
+                    break;
+                }
+            }
+
+            if (valid)
+            {
+                walls.Add(new Walls(x, y, width, height, Color.White, texture));
+                createdWalls++;
+            }
+
+            attempts++;
+            if (attempts > maxAttempts) break;
         }
 
         return walls;
     }
 
-    static void ResetGame(Tank blueTank, Tank redTank, out List<Walls> newWalls, int screenWidth, int screenHeight)
+    static void ResetGame(Tank blueTank, Tank redTank, out List<Walls> newWalls, int screenWidth, int screenHeight, Texture2D texture)
     {
         blueTank.ResetPosition();
         redTank.ResetPosition();
-        newWalls = GenerateWalls(screenWidth, screenHeight);
+        newWalls = GenerateWalls(screenWidth, screenHeight, texture);
     }
 }
-
-
-
-
-
-
-
-
