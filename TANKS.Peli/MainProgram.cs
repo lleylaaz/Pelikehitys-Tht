@@ -13,14 +13,12 @@ class Program
         Raylib.SetTargetFPS(60);
         Raylib.InitAudioDevice();
 
-        // Ladataan textuurit ja ääni
         Texture2D brickTexture = Raylib.LoadTexture("Brick_Wall_Texture.jpg");
         Texture2D blueTankTexture = Raylib.LoadTexture("Blue_Tank_Texture.jpg");
         Texture2D redTankTexture = Raylib.LoadTexture("Red_Tank_Texture.jpg");
 
         Sound shootSound = Raylib.LoadSound("New_Project (2).mp3");
 
-        // Luodaan tankit
         Tank blueTank = new Tank(100, 500, Color.Blue, blueTankTexture, shootSound);
         Tank redTank = new Tank(700, 500, Color.Red, redTankTexture, shootSound);
 
@@ -43,7 +41,6 @@ class Program
                     break;
 
                 case GameState.Playing:
-                    // Päivitykset: tankit liikkuvat ja ampuvat
                     bool blueWasHit = redTank.Update(KeyboardKey.Up, KeyboardKey.Down, KeyboardKey.Left, KeyboardKey.Right, KeyboardKey.Enter, walls, blueTank);
                     bool redWasHit = blueTank.Update(KeyboardKey.W, KeyboardKey.S, KeyboardKey.A, KeyboardKey.D, KeyboardKey.Space, walls, redTank);
 
@@ -60,7 +57,6 @@ class Program
                         ResetGame(blueTank, redTank, out walls, screenWidth, screenHeight, brickTexture);
                     }
 
-                    // Piirretään ruutu
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(Color.White);
 
