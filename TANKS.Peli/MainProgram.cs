@@ -1,7 +1,7 @@
-﻿using Raylib_cs;
-using System.Numerics;
-using System.Collections.Generic;
+﻿using System.Numerics;
+using Raylib_cs;
 
+// Käytin välillä ChatGPT:tä johonkin kohtiin.
 class Program
 {
     static void Main()

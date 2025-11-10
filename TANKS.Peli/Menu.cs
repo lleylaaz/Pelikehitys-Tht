@@ -1,6 +1,7 @@
-﻿using Raylib_cs;
-using System.Numerics;
+﻿using System.Numerics;
+using Raylib_cs;
 
+// Käytin välillä ChatGPT:tä johonkin kohtiin.
 public class Menu
 {
     private GameState nextState;
@@ -38,7 +39,7 @@ public class Menu
 
         if (quitHover && Raylib.IsMouseButtonPressed(MouseButton.Left))
         {
-            Raylib.CloseWindow(); 
+            Raylib.CloseWindow();
             System.Environment.Exit(0);
         }
 

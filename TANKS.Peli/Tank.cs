@@ -1,7 +1,7 @@
-﻿using Raylib_cs;
-using System.Numerics;
-using System.Collections.Generic;
+﻿using System.Numerics;
+using Raylib_cs;
 
+// Käytin välillä ChatGPT:tä johonkin kohtiin.
 class Tank
 {
     public Vector2 Position;
@@ -12,14 +12,11 @@ class Tank
 
     private float speed = 2f;
     private double lastShootTime = 0;
-    private double shootInterval = 0.25; // voit säätää tulinopeutta
+    private double shootInterval = 0.25;
     private Vector2 startPosition;
 
-    // Etäisyys tankin keskeltä putken kärkeen (pikseleinä)
     private float turretLength = 25f;
 
-    // Koska tekstuuri osoittaa suoraan ylös mutta Raylibin 0° on oikealle,
-    // käytämme 90° offsettia piirtämiseen ja spawn/laskentaan.
     private float rotationOffset = 90f;
 
     public Tank(float x, float y, Color color, Texture2D texture = default)
@@ -49,7 +46,6 @@ class Tank
         if (Raylib.IsKeyDown(turnLeft)) Rotation -= 2f;
         if (Raylib.IsKeyDown(turnRight)) Rotation += 2f;
 
-        // Liike perustuu "loogiseen" Rotation-arvoon (ilman offsettia)
         float moveRad = Rotation * (MathF.PI / 180f);
 
         if (Raylib.IsKeyDown(forward))
@@ -72,7 +68,6 @@ class Tank
             }
         }
 
-        // Ammuksen luonti
         if (Raylib.IsKeyPressed(shootKey) && (Raylib.GetTime() - lastShootTime > shootInterval))
         {
             lastShootTime = Raylib.GetTime();
@@ -116,7 +111,7 @@ class Tank
                 new Rectangle(0, 0, Texture.Width, Texture.Height),
                 new Rectangle(Position.X, Position.Y, 40, 40),
                 new Vector2(20, 20),
-                Rotation - 90f, 
+                Rotation - 90f,
                 Color.White
             );
 

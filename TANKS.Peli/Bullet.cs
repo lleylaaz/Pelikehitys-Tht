@@ -1,6 +1,7 @@
-﻿using Raylib_cs;
-using System.Numerics;
+﻿using System.Numerics;
+using Raylib_cs;
 
+// Käytin välillä ChatGPT:tä johonkin kohtiin.
 class Bullet
 {
     public Vector2 Position;
