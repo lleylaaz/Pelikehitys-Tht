@@ -15,17 +15,16 @@ class Tank
     private double shootInterval = 0.25;
     private Vector2 startPosition;
 
-    private float turretLength = 25f;
+    private Sound shootSound;
 
-    private float rotationOffset = 90f;
-
-    public Tank(float x, float y, Color color, Texture2D texture = default)
+    public Tank(float x, float y, Color color, Texture2D texture = default, Sound shootSound = default, Sound moveSound = default)
     {
         Position = new Vector2(x, y);
         startPosition = Position;
         TankColor = color;
         Texture = texture;
         Rotation = 0f;
+        this.shootSound = shootSound;
     }
 
     public void ResetPosition()
@@ -42,44 +41,55 @@ class Tank
     public bool Update(KeyboardKey forward, KeyboardKey backward, KeyboardKey turnLeft, KeyboardKey turnRight, KeyboardKey shootKey, List<Walls> walls, Tank opponent)
     {
         Vector2 oldPosition = Position;
+        bool isMoving = false;
 
+        // Kääntyminen
         if (Raylib.IsKeyDown(turnLeft)) Rotation -= 2f;
         if (Raylib.IsKeyDown(turnRight)) Rotation += 2f;
 
         float moveRad = Rotation * (MathF.PI / 180f);
 
+        // Liike
         if (Raylib.IsKeyDown(forward))
         {
             Position.X += MathF.Cos(moveRad) * speed;
             Position.Y += MathF.Sin(moveRad) * speed;
+            isMoving = true;
         }
         if (Raylib.IsKeyDown(backward))
         {
             Position.X -= MathF.Cos(moveRad) * speed;
             Position.Y -= MathF.Sin(moveRad) * speed;
+            isMoving = true;
         }
 
+        // Seinien tarkistus
         foreach (var wall in walls)
         {
             if (Raylib.CheckCollisionRecs(GetBounds(), wall.GetBounds()))
             {
                 Position = oldPosition;
+                isMoving = false;
                 break;
             }
         }
 
+        // Liikkumisääni (jatkuva)
+        // Ampuminen
         if (Raylib.IsKeyPressed(shootKey) && (Raylib.GetTime() - lastShootTime > shootInterval))
         {
             lastShootTime = Raylib.GetTime();
-            float rad = Rotation * (MathF.PI / 180);
+            float rad = Rotation * (MathF.PI / 180f);
 
             float projectileX = Position.X + MathF.Cos(rad) * 25f;
             float projectileY = Position.Y + MathF.Sin(rad) * 25f;
 
             Projectiles.Add(new Bullet(projectileX, projectileY, Rotation));
+
+            Raylib.PlaySound(shootSound); // ampumisääni
         }
 
-
+        // Luodit ja osumat
         bool opponentWasHit = false;
         foreach (var projectile in Projectiles)
         {
@@ -104,6 +114,7 @@ class Tank
 
     public void Draw()
     {
+        // Tankin piirto
         if (Texture.Id != 0)
         {
             Raylib.DrawTexturePro(
@@ -114,16 +125,14 @@ class Tank
                 Rotation - 90f,
                 Color.White
             );
-
         }
         else
         {
             Raylib.DrawRectangleV(Position - new Vector2(20, 20), new Vector2(40, 40), TankColor);
         }
 
+        // Luodit
         foreach (var projectile in Projectiles)
-        {
             projectile.Draw();
-        }
     }
 }

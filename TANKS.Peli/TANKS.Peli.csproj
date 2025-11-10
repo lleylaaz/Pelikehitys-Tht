@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <None Update="Blue_Tank_Texture.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Blue_Tank_Texture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -22,10 +22,13 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Brick_Wall_Texture.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="New_Project %282%29.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Red_Tank_Texture.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Red_Tank_Texture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

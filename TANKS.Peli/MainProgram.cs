@@ -8,23 +8,29 @@ class Program
     {
         const int screenWidth = 800;
         const int screenHeight = 600;
+
         Raylib.InitWindow(screenWidth, screenHeight, "TANKS");
         Raylib.SetTargetFPS(60);
+        Raylib.InitAudioDevice();
 
+        // Ladataan textuurit ja ääni
         Texture2D brickTexture = Raylib.LoadTexture("Brick_Wall_Texture.jpg");
         Texture2D blueTankTexture = Raylib.LoadTexture("Blue_Tank_Texture.jpg");
         Texture2D redTankTexture = Raylib.LoadTexture("Red_Tank_Texture.jpg");
 
-        GameState gameState = GameState.MainMenu;
-        Menu menu = new Menu();
+        Sound shootSound = Raylib.LoadSound("New_Project (2).mp3");
 
-        Tank blueTank = new Tank(100, 500, Color.Blue, blueTankTexture);
-        Tank redTank = new Tank(700, 500, Color.Red, redTankTexture);
+        // Luodaan tankit
+        Tank blueTank = new Tank(100, 500, Color.Blue, blueTankTexture, shootSound);
+        Tank redTank = new Tank(700, 500, Color.Red, redTankTexture, shootSound);
 
         int blueScore = 0;
         int redScore = 0;
 
         List<Walls> walls = GenerateWalls(screenWidth, screenHeight, brickTexture);
+
+        GameState gameState = GameState.MainMenu;
+        Menu menu = new Menu();
 
         while (!Raylib.WindowShouldClose())
         {
@@ -37,6 +43,7 @@ class Program
                     break;
 
                 case GameState.Playing:
+                    // Päivitykset: tankit liikkuvat ja ampuvat
                     bool blueWasHit = redTank.Update(KeyboardKey.Up, KeyboardKey.Down, KeyboardKey.Left, KeyboardKey.Right, KeyboardKey.Enter, walls, blueTank);
                     bool redWasHit = blueTank.Update(KeyboardKey.W, KeyboardKey.S, KeyboardKey.A, KeyboardKey.D, KeyboardKey.Space, walls, redTank);
 
@@ -53,6 +60,7 @@ class Program
                         ResetGame(blueTank, redTank, out walls, screenWidth, screenHeight, brickTexture);
                     }
 
+                    // Piirretään ruutu
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(Color.White);
 
@@ -70,6 +78,12 @@ class Program
             }
         }
 
+        Raylib.UnloadSound(shootSound);
+        Raylib.UnloadTexture(brickTexture);
+        Raylib.UnloadTexture(blueTankTexture);
+        Raylib.UnloadTexture(redTankTexture);
+
+        Raylib.CloseAudioDevice();
         Raylib.CloseWindow();
     }
 
