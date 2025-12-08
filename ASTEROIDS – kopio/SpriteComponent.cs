@@ -1,31 +1,34 @@
-﻿using System.Numerics;
-using Raylib_cs;
+﻿using Raylib_cs;
+using System.Numerics;
 
 namespace ASTEROIDS
 {
-    public class SpriteComponent : Component
+    public class SpriteComponent
     {
-        private Texture2D texture;
-        private Rectangle drawSource;
-        private Vector2 origin;
-        private float size;
+        Texture2D texture; // Spriten kuva
+        float scale;       // Skaalauskerroin
 
-        public SpriteComponent(Texture2D texture, float size = 1f)
+        public SpriteComponent(Texture2D tex, float s)
         {
-            this.texture = texture;
-            this.size = size;
-            drawSource = new Rectangle(0, 0, texture.Width, texture.Height);
-            origin = new Vector2(texture.Width / 2f, texture.Height / 2f);
+            texture = tex;
+            scale = s;
         }
 
-        public void Draw(Vector2 position, float rotationRadians)
+        public void Draw(TransformComponent transform)
         {
-            if (texture.Width == 0) return;
-            float rotationDegrees = rotationRadians * (180f / MathF.PI);
-            Rectangle drawDest = new Rectangle(position.X, position.Y, texture.Width * size, texture.Height * size);
-            Vector2 scaledOrigin = origin * size;
+            // Piirron alkuperä keskelle
+            Vector2 origin = new Vector2(texture.Width / 2f, texture.Height / 2f);
 
-            Raylib.DrawTexturePro(texture, drawSource, drawDest, scaledOrigin, rotationDegrees, Color.White);
+            // DrawTexturePro piirtää tekstuurin transformin mukaan
+            Raylib.DrawTexturePro(
+                texture,
+                new Rectangle(0, 0, texture.Width, texture.Height), // koko kuva
+                new Rectangle(transform.position.X, transform.position.Y,
+                    texture.Width * scale, texture.Height * scale), // kohde + skaala
+                origin,
+                transform.rotation,                                 // kierto
+                Color.White
+            );
         }
     }
 }

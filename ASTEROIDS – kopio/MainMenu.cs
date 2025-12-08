@@ -1,23 +1,35 @@
-﻿using Raylib_cs;
-using static RayGui;
+﻿using ASTEROIDS;
+using Raylib_cs;
 
-namespace ASTEROIDS
+public class MainMenu
 {
-    public class MainMenu
+    // Aloitusnappi
+    UIButton startButton = new UIButton(300, 250, 200, 60, "Start Game");
+
+    // Lopetusnappi
+    UIButton quitButton = new UIButton(300, 330, 200, 60, "Quit");
+
+    public GameState Update()
     {
-        public event Action OnStartGame;
-        public event Action OnExitGame;
+        // Aloita peli
+        if (startButton.IsClicked())
+            return GameState.Playing;
 
-        public void Draw()
-        {
-            GuiLabel(new Rectangle(320, 150, 200, 40), "ASTEROIDS");
+        // Sulje peli
+        if (quitButton.IsClicked())
+            Raylib.CloseWindow();
 
-            if (GuiButton(new Rectangle(320, 220, 200, 40), "Start Game"))
-                OnStartGame?.Invoke();
+        // Pysy valikossa
+        return GameState.MainMenu;
+    }
 
-            if (GuiButton(new Rectangle(320, 280, 200, 40), "Exit"))
-                OnExitGame?.Invoke();
-        }
+    public void Draw()
+    {
+        // Pelin otsikkoteksti
+        Raylib.DrawText("ASTEROIDS", 200, 100, 60, Color.White);
+
+        // Painikkeet
+        startButton.Draw();
+        quitButton.Draw();
     }
 }
-

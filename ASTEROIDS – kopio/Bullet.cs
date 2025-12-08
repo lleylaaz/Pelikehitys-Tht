@@ -1,48 +1,53 @@
 ﻿using System.Numerics;
 using Raylib_cs;
-using static RayGui;
 
 namespace ASTEROIDS
 {
+    // Ammus-luokka
     public class Bullet
     {
-        public TransformComponent transform;
-        public SpriteComponent sprite;
-        public CollisionComponent collision;
-        public float Radius { get; private set; }
-        public bool isAlive;
-        public float lifetime;
+        public Vector2 Position;  // Ammuksen sijainti
+        public float Rotation;    // Ammuksen kulma
+        public float Speed = 500f; // Ammuksen nopeus
+        public bool IsAlive = true; // Onko ammus elossa
 
-        public Bullet(Vector2 position, Vector2 direction, Texture2D texture)
+        Texture2D Tex; // Ammuksen tekstuuri
+
+        // Konstruktori
+        public Bullet(Vector2 startPos, float rot, Texture2D texture)
         {
-            isAlive = true;
-            transform = new TransformComponent(position);
-            transform.direction = Vector2.Normalize(direction);
-            transform.velocity = transform.direction * 400.0f;
-            transform.rotationRadians = MathF.Atan2(transform.direction.Y, transform.direction.X) + MathF.PI / 2;
-
-            sprite = new SpriteComponent(texture);
-            collision = new CollisionComponent(texture.Width / 2f, transform);
-            Radius = texture.Width / 2f;
-
-            lifetime = 2.0f;
+            Position = startPos;
+            Rotation = rot;
+            Tex = texture;
         }
 
-        public void Update(float deltaTime)
+        // Päivittää ammuksen sijainnin
+        public void Update(float dt)
         {
-            transform.Move();
-            lifetime -= deltaTime;
-            if (lifetime <= 0f)
-                isAlive = false;
+            Vector2 dir = new Vector2(
+                MathF.Cos(Rotation - MathF.PI / 2),
+                MathF.Sin(Rotation - MathF.PI / 2)
+            );
+            Position += dir * Speed * dt;
+
+            // Poistetaan ammus ruudun ulkopuolelta
+            if (Position.X < 0 || Position.X > 800 || Position.Y < 0 || Position.Y > 600)
+                IsAlive = false;
         }
 
+        // Piirtää ammun tekstuurin
         public void Draw()
         {
-            sprite.Draw(transform.position, transform.rotationRadians);
+            float angleDegrees = Rotation * (180f / MathF.PI);
+
+            Raylib.DrawTexturePro(
+                Tex,
+                new Rectangle(0, 0, Tex.Width, Tex.Height),
+                new Rectangle(Position.X, Position.Y, Tex.Width, Tex.Height),
+                new Vector2(Tex.Width / 2, Tex.Height / 2),
+                angleDegrees,
+                Color.White
+            );
         }
     }
 }
-
-
-
-

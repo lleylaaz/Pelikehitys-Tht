@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <None Update="laserRed07.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="meteorBrown_big1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -1,24 +1,35 @@
-﻿using Raylib_cs;
-using static RayGui;
+﻿using ASTEROIDS;
+using Raylib_cs;
 
-namespace ASTEROIDS
+public class PauseMenu
 {
-    public class PauseMenu
+    // Resume-painike
+    UIButton resumeButton = new UIButton(300, 250, 200, 60, "Resume");
+
+    // Palaa päävalikkoon
+    UIButton mainMenuButton = new UIButton(300, 330, 200, 60, "Main Menu");
+
+    public GameState Update()
     {
-        public event Action OnResume;
-        public event Action OnExit;
+        // Jatkaa peliä
+        if (resumeButton.IsClicked())
+            return GameState.Playing;
 
-        public void Draw()
-        {
-            GuiLabel(new Rectangle(320, 150, 200, 40), "Game Paused");
+        // Siirtyy päävalikkoon
+        if (mainMenuButton.IsClicked())
+            return GameState.MainMenu;
 
-            if (GuiButton(new Rectangle(320, 220, 200, 40), "Resume"))
-                OnResume?.Invoke();
+        // Pysyy pausessa
+        return GameState.Paused;
+    }
 
-            if (GuiButton(new Rectangle(320, 280, 200, 40), "Exit to Main Menu"))
-                OnExit?.Invoke();
-        }
+    public void Draw()
+    {
+        // Pauseteksti
+        Raylib.DrawText("PAUSED", 270, 120, 60, Color.White);
+
+        // Painikkeet
+        resumeButton.Draw();
+        mainMenuButton.Draw();
     }
 }
-
-

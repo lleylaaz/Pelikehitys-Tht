@@ -1,11 +1,12 @@
 ﻿namespace ASTEROIDS
 {
+    // Pelin eri tilat
     public enum GameState
     {
-        MainMenu,
-        Playing,
-        Paused,
-        GameOver,
-        Victory
+        MainMenu,    // Päävalikko
+        Playing,     // Itse peli
+        Paused,      // Pause-valikko
+        GameOver,    // Häviöruutu
+        Victory      // Voittoruutu
     }
 }

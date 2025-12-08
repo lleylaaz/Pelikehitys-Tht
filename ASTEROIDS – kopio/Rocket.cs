@@ -1,66 +1,99 @@
-﻿using Raylib_cs;
-using System.Numerics;
-using static RayGui;
+﻿using System.Numerics;
+using Raylib_cs;
 
 namespace ASTEROIDS
 {
     public class Rocket
     {
-        public TransformComponent transform;
-        public SpriteComponent sprite;
-        public CollisionComponent collision;
+        // Raketin sijainti ruudulla
+        public Vector2 Position;
 
-        public float Radius { get; private set; }
-        public float spriteWidth;
-        public float spriteHeight;
+        // Nopeus (liikemäärä)
+        public Vector2 Velocity = Vector2.Zero;
 
-        public Rocket(Vector2 position, Texture2D texture)
+        // Raketin rotaatio radiaaneina
+        public float Rotation = 0f;
+
+        // Raketin kiihtyvyys W-näppäintä painettaessa
+        public float Speed = 200f;
+
+        // Kitka joka hidastaa rakettia
+        public float Drag = 0.98f;
+
+        // Pelaajan HP
+        public int HP = 100;
+
+        // Raketin tekstuuri
+        Texture2D Tex;
+
+        public Rocket(Vector2 startPos, Texture2D texture)
         {
-            transform = new TransformComponent(position);
-            sprite = new SpriteComponent(texture);
-            collision = new CollisionComponent(texture.Width / 2f, transform);
-
-            spriteWidth = texture.Width;
-            spriteHeight = texture.Height;
-            Radius = texture.Width / 2f;
+            Position = startPos;
+            Tex = texture;
         }
 
+        public void Update(float dt)
+        {
+            // Kääntyminen vasemmalle
+            if (Raylib.IsKeyDown(KeyboardKey.A))
+                Rotation -= 3f * dt;
+
+            // Kääntyminen oikealle
+            if (Raylib.IsKeyDown(KeyboardKey.D))
+                Rotation += 3f * dt;
+
+            // Liikkuminen eteenpäin W:llä
+            if (Raylib.IsKeyDown(KeyboardKey.W))
+            {
+                // Lasketaan eteenpäin suunta
+                Vector2 dir = new Vector2(
+                    MathF.Cos(Rotation - MathF.PI / 2),
+                    MathF.Sin(Rotation - MathF.PI / 2)
+                );
+
+                // Lisää nopeutta siihen suuntaan
+                Velocity += dir * Speed * dt;
+            }
+
+            // Hidastetaan rakettia kitkalla
+            Velocity *= Drag;
+
+            // Päivitetään sijainti
+            Position += Velocity * dt;
+
+            // Ruudun reunojen teleporttaus
+            if (Position.X < 0) Position.X = 800;
+            if (Position.X > 800) Position.X = 0;
+
+            if (Position.Y < 0) Position.Y = 600;
+            if (Position.Y > 600) Position.Y = 0;
+        }
+
+        // Missä kohtaa ammuksen tulisi ilmestyä
         public Vector2 GetBulletSpawnPosition()
         {
-            Vector2 forward = GetDirection();
-            float offset = MathF.Max(spriteWidth, spriteHeight) / 2f;
-            return transform.position + forward * offset;
-        }
+            Vector2 dir = new Vector2(
+                MathF.Cos(Rotation - MathF.PI / 2),
+                MathF.Sin(Rotation - MathF.PI / 2)
+            );
 
-        public void Update(float deltaTime)
-        {
-            float rotationSpeed = 3.0f;
-
-            if (Raylib.IsKeyDown(KeyboardKey.A))
-                transform.rotationRadians -= rotationSpeed * deltaTime;
-
-            if (Raylib.IsKeyDown(KeyboardKey.D))
-                transform.rotationRadians += rotationSpeed * deltaTime;
-
-            float angle = transform.rotationRadians - MathF.PI / 2;
-            transform.direction = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
-
-            if (Raylib.IsKeyDown(KeyboardKey.W))
-                transform.velocity += transform.direction * 100f * deltaTime;
-
-            transform.Move();
+            return Position + dir * 35f;   // 35 pikseliä raketin kärjestä
         }
 
         public void Draw()
         {
-            sprite.Draw(transform.position, transform.rotationRadians);
-        }
+            // Muutetaan radiaanit asteiksi piirtämistä varten
+            float angleDegrees = Rotation * (180f / MathF.PI);
 
-        public Vector2 GetDirection()
-        {
-            float angle = transform.rotationRadians - MathF.PI / 2;
-            return new Vector2(MathF.Cos(angle), MathF.Sin(angle));
+            // Piirretään tekstuuri keskipisteestä
+            Raylib.DrawTexturePro(
+                Tex,
+                new Rectangle(0, 0, Tex.Width, Tex.Height),
+                new Rectangle(Position.X, Position.Y, Tex.Width, Tex.Height),
+                new Vector2(Tex.Width / 2, Tex.Height / 2),
+                angleDegrees,
+                Color.White
+            );
         }
     }
 }
-

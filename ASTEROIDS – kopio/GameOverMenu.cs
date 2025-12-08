@@ -1,22 +1,42 @@
-﻿using Raylib_cs;
-using static RayGui;
+﻿using ASTEROIDS;
+using Raylib_cs;
 
-namespace ASTEROIDS
+public class GameOverMenu
 {
-    public class GameOverMenu
+    // Yritä uudelleen
+    UIButton retryButton = new UIButton(300, 250, 200, 60, "Retry");
+
+    // Takaisin päävalikkoon
+    UIButton mainMenuButton = new UIButton(300, 330, 200, 60, "Main Menu");
+
+    public GameState Update(Program game)
     {
-        public event Action OnRestart;
-        public event Action OnExit;
-
-        public void Draw()
+        // Aloita uudelleen nykyinen taso
+        if (retryButton.IsClicked())
         {
-            GuiLabel(new Rectangle(320, 150, 200, 40), "Game Over");
-
-            if (GuiButton(new Rectangle(320, 220, 200, 40), "Restart"))
-                OnRestart?.Invoke();
-
-            if (GuiButton(new Rectangle(320, 280, 200, 40), "Exit to Main Menu"))
-                OnExit?.Invoke();
+            game.StartGame();
+            return GameState.Playing;
         }
+
+        // Palaa päävalikkoon ja resetoi level
+        if (mainMenuButton.IsClicked())
+        {
+            game.level = 1;
+            game.StartGame();
+            return GameState.MainMenu;
+        }
+
+        // Pysyy Game Over tilassa
+        return GameState.GameOver;
+    }
+
+    public void Draw()
+    {
+        // Game Over -teksti
+        Raylib.DrawText("GAME OVER", 220, 120, 60, Color.Red);
+
+        // Painikkeet
+        retryButton.Draw();
+        mainMenuButton.Draw();
     }
 }

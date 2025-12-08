@@ -1,23 +1,39 @@
-﻿using Raylib_cs;
-using static RayGui;
+﻿using ASTEROIDS;
+using Raylib_cs;
 
-namespace ASTEROIDS
+public class VictoryMenu
 {
-    public class VictoryMenu
+    // Napit: seuraava taso ja päävalikko
+    UIButton nextButton = new UIButton(300, 250, 200, 60, "Next Level");
+    UIButton mainMenuButton = new UIButton(300, 330, 200, 60, "Main Menu");
+
+    public GameState Update(Program game)
     {
-        public event Action OnRestart;
-        public event Action OnExit;
-
-        public void Draw()
+        // Seuraava taso -nappi
+        if (nextButton.IsClicked())
         {
-            GuiLabel(new Rectangle(320, 150, 200, 40), "You Win!");
-
-            if (GuiButton(new Rectangle(320, 220, 200, 40), "Play Again"))
-                OnRestart?.Invoke();
-
-            if (GuiButton(new Rectangle(320, 280, 200, 40), "Exit to Main Menu"))
-                OnExit?.Invoke();
+            game.StartGame();
+            return GameState.Playing;
         }
+
+        // Päävalikkoon
+        if (mainMenuButton.IsClicked())
+        {
+            game.level = 1;
+            game.StartGame();
+            return GameState.MainMenu;
+        }
+
+        return GameState.Victory;
+    }
+
+    public void Draw()
+    {
+        // Teksti
+        Raylib.DrawText("VICTORY!", 220, 120, 60, Color.Green);
+
+        // Piirrä napit
+        nextButton.Draw();
+        mainMenuButton.Draw();
     }
 }
-
