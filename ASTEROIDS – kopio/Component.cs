@@ -1,4 +1,6 @@
-﻿namespace ASTEROIDS
+﻿using ASTEROIDS;
+
+namespace ASTEROIDS
 {
     // Abstrakti komponentti, josta kaikki pelin komponentit voivat periä
     public abstract class Component

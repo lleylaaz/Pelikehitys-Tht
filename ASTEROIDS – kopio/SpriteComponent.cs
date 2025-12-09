@@ -1,32 +1,27 @@
-﻿using Raylib_cs;
-using System.Numerics;
+﻿using System.Numerics;
+using Raylib_cs;
 
 namespace ASTEROIDS
 {
     public class SpriteComponent
     {
-        Texture2D texture; // Spriten kuva
-        float scale;       // Skaalauskerroin
+        private Texture2D texture;
 
-        public SpriteComponent(Texture2D tex, float s)
+        public SpriteComponent(Texture2D tex)
         {
             texture = tex;
-            scale = s;
         }
 
-        public void Draw(TransformComponent transform)
+        // Lisätty scale-parametri
+        public void Draw(Vector2 position, float rotation, float scale = 1f)
         {
-            // Piirron alkuperä keskelle
             Vector2 origin = new Vector2(texture.Width / 2f, texture.Height / 2f);
-
-            // DrawTexturePro piirtää tekstuurin transformin mukaan
             Raylib.DrawTexturePro(
                 texture,
-                new Rectangle(0, 0, texture.Width, texture.Height), // koko kuva
-                new Rectangle(transform.position.X, transform.position.Y,
-                    texture.Width * scale, texture.Height * scale), // kohde + skaala
+                new Rectangle(0, 0, texture.Width, texture.Height),
+                new Rectangle(position.X, position.Y, texture.Width * scale, texture.Height * scale),
                 origin,
-                transform.rotation,                                 // kierto
+                rotation * (180f / MathF.PI), // Raylib odottaa asteita
                 Color.White
             );
         }

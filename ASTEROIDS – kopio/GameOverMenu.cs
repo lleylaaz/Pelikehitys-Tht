@@ -30,10 +30,11 @@ public class GameOverMenu
         return GameState.GameOver;
     }
 
-    public void Draw()
+    public void Draw(Program game)
     {
         // Game Over -teksti
         Raylib.DrawText("GAME OVER", 220, 120, 60, Color.Red);
+        Raylib.DrawText($"Final Score: {game.Score}", 300, 200, 30, Color.White);
 
         // Painikkeet
         retryButton.Draw();

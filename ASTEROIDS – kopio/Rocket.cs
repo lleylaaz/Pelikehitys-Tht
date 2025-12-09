@@ -5,95 +5,59 @@ namespace ASTEROIDS
 {
     public class Rocket
     {
-        // Raketin sijainti ruudulla
-        public Vector2 Position;
+        public TransformComponent Transform;
+        public SpriteComponent Sprite;
+        public CollisionComponent Collision;
 
-        // Nopeus (liikemäärä)
-        public Vector2 Velocity = Vector2.Zero;
-
-        // Raketin rotaatio radiaaneina
-        public float Rotation = 0f;
-
-        // Raketin kiihtyvyys W-näppäintä painettaessa
-        public float Speed = 200f;
-
-        // Kitka joka hidastaa rakettia
+        public float Speed = 250f;
         public float Drag = 0.98f;
-
-        // Pelaajan HP
         public int HP = 100;
-
-        // Raketin tekstuuri
-        Texture2D Tex;
 
         public Rocket(Vector2 startPos, Texture2D texture)
         {
-            Position = startPos;
-            Tex = texture;
+            Transform = new TransformComponent(startPos);
+            Sprite = new SpriteComponent(texture);
+            Collision = new CollisionComponent(texture.Width / 2, Transform);
         }
 
-        public void Update(float dt)
+        public void UpdateInput(float dt)
         {
-            // Kääntyminen vasemmalle
+            float rotationSpeed = 4.0f; // rad/s
+            float accelerationAmount = 200f; // pikseliä/s²
+
+            // Kääntäminen
             if (Raylib.IsKeyDown(KeyboardKey.A))
-                Rotation -= 3f * dt;
-
-            // Kääntyminen oikealle
+                Transform.rotationRadians -= rotationSpeed * dt;
             if (Raylib.IsKeyDown(KeyboardKey.D))
-                Rotation += 3f * dt;
+                Transform.rotationRadians += rotationSpeed * dt;
 
-            // Liikkuminen eteenpäin W:llä
+            // Liike eteenpäin
             if (Raylib.IsKeyDown(KeyboardKey.W))
             {
-                // Lasketaan eteenpäin suunta
-                Vector2 dir = new Vector2(
-                    MathF.Cos(Rotation - MathF.PI / 2),
-                    MathF.Sin(Rotation - MathF.PI / 2)
-                );
-
-                // Lisää nopeutta siihen suuntaan
-                Velocity += dir * Speed * dt;
+                Transform.acceleration = new Vector2(
+                    MathF.Sin(Transform.rotationRadians),
+                    -MathF.Cos(Transform.rotationRadians)  // y-akseli ylös
+                ) * accelerationAmount;
             }
-
-            // Hidastetaan rakettia kitkalla
-            Velocity *= Drag;
-
-            // Päivitetään sijainti
-            Position += Velocity * dt;
-
-            // Ruudun reunojen teleporttaus
-            if (Position.X < 0) Position.X = 800;
-            if (Position.X > 800) Position.X = 0;
-
-            if (Position.Y < 0) Position.Y = 600;
-            if (Position.Y > 600) Position.Y = 0;
+            else
+            {
+                Transform.acceleration = Vector2.Zero;
+            }
         }
 
-        // Missä kohtaa ammuksen tulisi ilmestyä
         public Vector2 GetBulletSpawnPosition()
         {
-            Vector2 dir = new Vector2(
-                MathF.Cos(Rotation - MathF.PI / 2),
-                MathF.Sin(Rotation - MathF.PI / 2)
-            );
-
-            return Position + dir * 35f;   // 35 pikseliä raketin kärjestä
+            float offset = 40f; // etäisyys raketin nokasta, säädä spriteen sopivaksi
+            return Transform.position + new Vector2(
+                MathF.Sin(Transform.rotationRadians),
+                -MathF.Cos(Transform.rotationRadians)
+            ) * offset;
         }
 
         public void Draw()
         {
-            // Muutetaan radiaanit asteiksi piirtämistä varten
-            float angleDegrees = Rotation * (180f / MathF.PI);
-
-            // Piirretään tekstuuri keskipisteestä
-            Raylib.DrawTexturePro(
-                Tex,
-                new Rectangle(0, 0, Tex.Width, Tex.Height),
-                new Rectangle(Position.X, Position.Y, Tex.Width, Tex.Height),
-                new Vector2(Tex.Width / 2, Tex.Height / 2),
-                angleDegrees,
-                Color.White
-            );
+            // Piirretään sprite kulman mukaan
+            Sprite.Draw(Transform.position, Transform.rotationRadians);
         }
     }
 }

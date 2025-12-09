@@ -1,28 +1,25 @@
 ﻿using System.Numerics;
+using Raylib_cs;
 
 namespace ASTEROIDS
 {
-    // Komponentti, joka hallitsee törmäyksiä
     public class CollisionComponent
     {
-        // Viittaus transform komponenttiin (sijainti ja rotaatio)
+        public float radius;
         public TransformComponent transform;
 
-        // Törmäyksen säde
-        public float radius;
-
-        // Konstruktori
-        public CollisionComponent(float r, TransformComponent t)
+        public CollisionComponent(float radius, TransformComponent transform)
         {
-            radius = r;
-            transform = t;
+            this.radius = radius;
+            this.transform = transform;
         }
 
-        // Tarkistaa törmäyksen toiseen komponenttiin
         public bool CheckCollision(CollisionComponent other)
         {
-            float dist = Vector2.Distance(transform.position, other.transform.position);
-            return dist < (radius + other.radius);
+            return Raylib.CheckCollisionCircles(
+                transform.position, radius,
+                other.transform.position, other.radius
+            );
         }
     }
 }

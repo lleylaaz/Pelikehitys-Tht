@@ -27,11 +27,11 @@ public class VictoryMenu
         return GameState.Victory;
     }
 
-    public void Draw()
+    public void Draw(Program game)
     {
         // Teksti
         Raylib.DrawText("VICTORY!", 220, 120, 60, Color.Green);
-
+        Raylib.DrawText($"Score: {game.Score}", 330, 200, 30, Color.White);
         // Piirrä napit
         nextButton.Draw();
         mainMenuButton.Draw();
