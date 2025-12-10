@@ -12,6 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="fire15.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="laserRed07.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

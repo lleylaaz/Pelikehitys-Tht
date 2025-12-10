@@ -22,7 +22,7 @@ namespace ASTEROIDS
         }
         public void Draw()
         {
-            Sprite.Draw(Transform.position, 0f, Size); // Käytetään Size-muuttujaa skaalaamiseen
+            Sprite.Draw(Transform.position, 0f, Size); // Käytetään Size muuttujaa skaalaamiseen
         }
     }
 }

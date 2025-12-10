@@ -9,15 +9,19 @@ namespace ASTEROIDS
         public SpriteComponent Sprite;
         public CollisionComponent Collision;
 
+        public Texture2D fireTexture;   // liekki lisätty raketin taakse
+
         public float Speed = 250f;
         public float Drag = 0.98f;
         public int HP = 100;
 
-        public Rocket(Vector2 startPos, Texture2D texture)
+        public Rocket(Vector2 startPos, Texture2D texture, Texture2D fireTexture)
         {
             Transform = new TransformComponent(startPos);
             Sprite = new SpriteComponent(texture);
             Collision = new CollisionComponent(texture.Width / 2, Transform);
+
+            this.fireTexture = fireTexture;
         }
 
         public void UpdateInput(float dt)
@@ -36,7 +40,7 @@ namespace ASTEROIDS
             {
                 Transform.acceleration = new Vector2(
                     MathF.Sin(Transform.rotationRadians),
-                    -MathF.Cos(Transform.rotationRadians)  // y-akseli ylös
+                    -MathF.Cos(Transform.rotationRadians)
                 ) * accelerationAmount;
             }
             else
@@ -47,7 +51,7 @@ namespace ASTEROIDS
 
         public Vector2 GetBulletSpawnPosition()
         {
-            float offset = 40f; // etäisyys raketin nokasta, säädä spriteen sopivaksi
+            float offset = 40f;
             return Transform.position + new Vector2(
                 MathF.Sin(Transform.rotationRadians),
                 -MathF.Cos(Transform.rotationRadians)
@@ -56,8 +60,42 @@ namespace ASTEROIDS
 
         public void Draw()
         {
-            // Piirretään sprite kulman mukaan
+            // Piirrä liekki vain kun kiihdytetään
+            if (Raylib.IsKeyDown(KeyboardKey.W))
+            {
+                // Etäisyys raketin keskipisteestä taaksepäin 
+                float flameDistance = 35f;
+
+                // forward-vektori 
+                Vector2 forward = new Vector2(
+                    MathF.Sin(Transform.rotationRadians),
+                    -MathF.Cos(Transform.rotationRadians)
+                );
+
+                // liekin sijainti
+                Vector2 flamePos = Transform.position - forward * flameDistance;
+
+                float radToDeg = 180f / MathF.PI;
+                float flameRotationDeg = Transform.rotationRadians * radToDeg + 180f;
+
+                Rectangle src = new Rectangle(0, 0, fireTexture.Width, fireTexture.Height);
+                float scale = 1.5f;
+                Rectangle dest = new Rectangle(flamePos.X, flamePos.Y, fireTexture.Width * scale, fireTexture.Height * scale);
+                Vector2 origin = new Vector2((fireTexture.Width * scale) / 2f, (fireTexture.Height * scale) / 2f);
+
+                Raylib.DrawTexturePro(
+                    fireTexture,
+                    src,
+                    dest,
+                    origin,
+                    flameRotationDeg,
+                    Color.White
+                );
+            }
+
+            // Piirrä raketti
             Sprite.Draw(Transform.position, Transform.rotationRadians);
         }
+
     }
 }

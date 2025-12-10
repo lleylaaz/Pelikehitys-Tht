@@ -15,6 +15,7 @@ namespace ASTEROIDS
         public Texture2D rocketTexture;
         public Texture2D bulletTexture;
         public Texture2D asteroidsTexture;
+        public Texture2D fireTexture;
 
         public MainMenu mainMenu;
         public PauseMenu pauseMenu;
@@ -39,6 +40,7 @@ namespace ASTEROIDS
             rocketTexture = Raylib.LoadTexture("playerShip1_red.png");
             bulletTexture = Raylib.LoadTexture("laserRed07.png");
             asteroidsTexture = Raylib.LoadTexture("meteorBrown_big1.png");
+            fireTexture = Raylib.LoadTexture("fire15.png");
 
             mainMenu = new MainMenu();
             pauseMenu = new PauseMenu();
@@ -95,7 +97,8 @@ namespace ASTEROIDS
             Score = 0f;
 
             if (rocket == null)
-                rocket = new Rocket(new Vector2(400, 300), rocketTexture);
+                rocket = new Rocket(new Vector2(400, 300), rocketTexture, fireTexture);
+
             else
             {
                 rocket.Transform.position = new Vector2(400, 300);
