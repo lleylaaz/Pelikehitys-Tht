@@ -46,21 +46,5 @@ namespace ASTEROIDS
             // nollataan kiihtyvyys jokaisen päivityksen jälkeen
             acceleration = Vector2.Zero;
         }
-
-        public void Turn(float amountRadians)
-        {
-            rotationRadians += amountRadians;
-            direction = Vector2.Transform(direction, Matrix3x2.CreateRotation(amountRadians));
-        }
-
-        public void AddForce(Vector2 force)
-        {
-            acceleration += force;
-        }
-
-        public void AddForceToDirection(float force)
-        {
-            acceleration += direction * force;
-        }
     }
 }

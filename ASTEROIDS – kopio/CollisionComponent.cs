@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using Raylib_cs;
+﻿using Raylib_cs;
 
 namespace ASTEROIDS
 {
@@ -12,15 +11,6 @@ namespace ASTEROIDS
         {
             Radius = radius;
             Transform = transform;
-        }
-
-        // Tarkistaa ympyrä–ympyrä -törmäyksen
-        public bool CheckCollision(CollisionComponent other)
-        {
-            return Raylib.CheckCollisionCircles(
-                Transform.position, Radius,
-                other.Transform.position, other.Radius
-            );
         }
     }
 }
