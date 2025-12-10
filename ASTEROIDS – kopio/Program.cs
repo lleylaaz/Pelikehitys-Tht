@@ -225,6 +225,7 @@ namespace ASTEROIDS
             }
         }
 
+        // Pelin piirto
         public void DrawGame()
         {
             foreach (var a in asteroids)
@@ -235,6 +236,7 @@ namespace ASTEROIDS
 
             rocket.Draw();
 
+            // HP bar
             int barWidth = 200;
             int hpBar = (int)(barWidth * (rocket.HP / 100f));
 

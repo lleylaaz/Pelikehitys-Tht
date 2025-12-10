@@ -5,20 +5,21 @@ namespace ASTEROIDS
 {
     public class CollisionComponent
     {
-        public float radius;
-        public TransformComponent transform;
+        public float Radius;                     // törmäyssäde
+        public TransformComponent Transform;     // omistavan objektin transform
 
         public CollisionComponent(float radius, TransformComponent transform)
         {
-            this.radius = radius;
-            this.transform = transform;
+            Radius = radius;
+            Transform = transform;
         }
 
+        // Tarkistaa ympyrä–ympyrä -törmäyksen
         public bool CheckCollision(CollisionComponent other)
         {
             return Raylib.CheckCollisionCircles(
-                transform.position, radius,
-                other.transform.position, other.radius
+                Transform.position, Radius,
+                other.Transform.position, other.Radius
             );
         }
     }

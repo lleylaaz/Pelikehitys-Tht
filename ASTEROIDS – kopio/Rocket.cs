@@ -23,7 +23,7 @@ namespace ASTEROIDS
         public void UpdateInput(float dt)
         {
             float rotationSpeed = 4.0f; // rad/s
-            float accelerationAmount = 200f; // pikseliä/s²
+            float accelerationAmount = 200f; // pikseliä/s
 
             // Kääntäminen
             if (Raylib.IsKeyDown(KeyboardKey.A))
